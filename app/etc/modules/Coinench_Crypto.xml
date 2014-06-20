@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+     <config>
+       <modules>
+         <Coinbench_Crypto>
+            <active>true</active>
+            <codePool>local</codePool>
+	    <depends>
+		<Mage_Payment />
+	    </depends>
+        </Coinbench_Crypto>
+      </modules>
+   </config>
