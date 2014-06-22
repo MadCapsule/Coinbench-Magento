@@ -64,6 +64,17 @@
             </coinbench_crypto>
         </updates>
     </layout>
+         <events>
+            <checkout_onepage_controller_success_action>
+                <observers>
+                   <Coinbench_Crypto_Model_Observer>
+                      <type>singleton</type>
+                      <class>Coinbench_Crypto_Model_Transaction_Observer</class>
+                      <method>assignAddress</method>
+                   </Coinbench_Crypto_Model_Observer>
+               </observers>
+            </checkout_onepage_controller_success_action>
+        </events>
     </frontend>
     <default>
         <payment>
