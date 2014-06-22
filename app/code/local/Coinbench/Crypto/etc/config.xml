@@ -47,6 +47,24 @@
             </crypto>  
         </helpers>
     </global>
+    <frontend>
+        <routers>
+            <crypto>
+                <use>standard</use>
+                <args>
+                    <module>Coinbench</module>
+                    <frontName>crypto</frontName>
+                </args>
+            </crypto>
+        </routers>
+    <layout>
+        <updates>
+            <coinbench_crypto module="Coinbench_Crypto">
+                <file>coinbench.xml</file>
+            </coinbench_crypto>
+        </updates>
+    </layout>
+    </frontend>
     <default>
         <payment>
             <crypto>
