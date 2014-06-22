@@ -1,0 +1,7 @@
+<layout version="0.1.0">
+	<checkout_onepage_success>
+    		<reference name="content">
+        		<block type="crypto/success" name="crypto.success" template="checkout/onepage/coinbench/success.phtml"/>
+		</reference>
+	</checkout_onepage_success>
+</layout>
