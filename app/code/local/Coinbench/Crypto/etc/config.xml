@@ -14,7 +14,16 @@
         <models>
             <crypto>
                 <class>Coinbench_Crypto_Model</class>
+         	<resourceModel>crypto_mysql4</resourceModel>
             </crypto>
+       	 <crypto_mysql4>
+           	<class>Coinbench_Crypto_Model_Mysql4</class>  
+            	<entities>
+                	<transaction>
+                    	<table>coinbench_crypto_transactions</table>
+                	</transaction>					
+            	</entities>                 
+         </crypto_mysql4>
         </models>
         <resources>
             <crypto_setup>
@@ -65,7 +74,7 @@
         </updates>
     </layout>
          <events>
-            <checkout_onepage_controller_success_action>
+            <sales_order_save_commit_after>
                 <observers>
                    <Coinbench_Crypto_Model_Observer>
                       <type>singleton</type>
@@ -73,7 +82,7 @@
                       <method>assignAddress</method>
                    </Coinbench_Crypto_Model_Observer>
                </observers>
-            </checkout_onepage_controller_success_action>
+            </sales_order_save_commit_after>
         </events>
     </frontend>
     <default>
