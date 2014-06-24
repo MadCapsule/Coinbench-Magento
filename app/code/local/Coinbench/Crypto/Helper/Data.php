@@ -15,15 +15,18 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 
 		$ch = curl_init();
 		$data = array();
-			
-		if(!is_null($token)){
+		$headers = array(
+			"username: {".Mage::getStoreConfig('payment/crypto/username')."}",
+			'Content-Type: application/json',
+		);		
+		/*if(!is_null($token)){
 			$headers = array(
 				"username: {$token}",
 				'Content-Type: application/json',
 			);
 		}else{
 			$headers = array('Content-Type: application/json');
-		}	
+		}*/	
 			
 		$authenticationUrl = 'https://coinbench.io/api/token';
 		curl_setopt($ch, CURLOPT_URL, $authenticationUrl);
@@ -60,8 +63,8 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 		}
 			
 		if(!empty($responseBody->response)){
-			$decoded_json = $responseBody->response;
-			Mage::log("Query product b: ".print_r($decoded_json, true),null,'coinbench.log');				
+			$decoded_json = (array) $responseBody->response;
+			Mage::log("JSON Response: ".print_r($decoded_json, true),null,'coinbench.log');				
 			return $decoded_json;
 		}else{
 			return;

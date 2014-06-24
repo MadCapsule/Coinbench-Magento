@@ -17,16 +17,23 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 		$transaction_data = array('order_id'=>$increment_id);
 
 		$token = Mage::getModel('crypto/token')->obtain();
-
 		if(!empty($token['error'])){
-			try{
-				$transaction = Mage::getModel('crypto/transaction')->setData($transaction_data)->save();
-			}catch (Exception $e) {
-				Mage::log($e,null,'coinbench.log');
-	       		} 
+			$transaction_data['message'] = $token['error'];
+			$transaction_data['status'] = 0;
 			Mage::log("Order ".$increment_id." no Coibench API token obtained. Error: ".$token['error']);
-			return;
-		}				
+		}
+
+		$address = Mage::getModel('crypto/address')->getFromPool();
+		if(!$address && empty($transaction_data['message'])){
+			$transaction_data['message'] = 'Unable to allocate an address';
+			$transaction_data['status'] = 0;
+		}
+
+		try{
+			$transaction = Mage::getModel('crypto/transaction')->setData($transaction_data)->save();
+		}catch (Exception $e) {
+			Mage::log($e,null,'coinbench.log');
+	       	} 			
 	}
 
 }
