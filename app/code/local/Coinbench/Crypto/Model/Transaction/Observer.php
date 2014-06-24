@@ -17,15 +17,15 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 		$transaction_data = array('order_id'=>$increment_id);
 
 		$token = Mage::getModel('crypto/token')->obtain();
-		if(!empty($token['error'])){
+		if(!empty($token['error'])){		
 			$transaction_data['message'] = $token['error'];
 			$transaction_data['status'] = 0;
 			Mage::log("Order ".$increment_id." no Coibench API token obtained. Error: ".$token['error']);
 		}
 
-		$address = Mage::getModel('crypto/address')->getFromPool();
-		if(!$address && empty($transaction_data['message'])){
-			$transaction_data['message'] = 'Unable to allocate an address';
+		$address = Mage::getModel('crypto/address')->getFromPool($token['token'], 'btc', '31.20902000');
+		if(!empty($address['error']) && empty($transaction_data['message'])){
+			$transaction_data['message'] = $address['error'];
 			$transaction_data['status'] = 0;
 		}
 

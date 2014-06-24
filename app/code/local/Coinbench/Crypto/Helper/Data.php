@@ -2,41 +2,54 @@
 class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 {	
 
-	//define URL https://coinbench.io/api/token
+	const _COINBENCH_TOKEN_URI = 'token';
+	const _COINBENCH_NEW_ADDRESS_URI = 'getnewaddress';
 	
 	public function getExtensionVersion()
 	{
 		return (string) Mage::getConfig()->getNode()->modules->Coinbench_Crypto->version;
 	}
 
-	public function request($resource, $postfields = null, $token = null, $method = null)
+	public function coinbench($resource, $postfields = null, $token = null){
+
+		$resource = _COINBENCH_TOKEN_URI;
+
+		if($resource=='getaddress'){
+			$uri = self::_COINBENCH_NEW_ADDRESS_URI;
+		}
+
+		return $this->request($uri, $postfields, $token);
+		
+	}
+
+	public function request($uri, $postfields = null, $token = null)
 	{
 		Mage::log("JSON: ".json_encode($postfields),null,'coinbench.log');	
 
+		$username = Mage::getStoreConfig('payment/crypto/username');
 		$ch = curl_init();
 		$data = array();
-		$headers = array(
-			"username: {".Mage::getStoreConfig('payment/crypto/username')."}",
-			'Content-Type: application/json',
-		);		
-		/*if(!is_null($token)){
+	
+		if(is_null($token)){
 			$headers = array(
-				"username: {$token}",
+				"username: {$username}",
 				'Content-Type: application/json',
 			);
 		}else{
-			$headers = array('Content-Type: application/json');
-		}*/	
-			
-		$authenticationUrl = 'https://coinbench.io/api/token';
+			$headers = array(
+				 "Authorization: Bearer {$token}",
+				 "username: {$username}",
+				 "currency: bitcoin",
+				 "Content-Type: application/json",
+			);
+		}	
+		Mage::log("header: ".print_r($headers, true),null,'coinbench.log');	
+		$authenticationUrl = 'https://coinbench.io/api/'.$uri;
 		curl_setopt($ch, CURLOPT_URL, $authenticationUrl);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		if(!is_null($postfields)){
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postfields));
-		}
-		if(!is_null($method) && $method=='p'){
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
 		}			
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		
