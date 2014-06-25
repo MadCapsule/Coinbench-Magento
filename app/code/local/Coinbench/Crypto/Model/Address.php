@@ -10,7 +10,7 @@ class Coinbench_Crypto_Model_Address extends Mage_Core_Model_Abstract
 			'currency'	=> $currency
 	);
 
-	return Mage::helper('crypto')->request('getaddress', $address_request, $token);
+	return Mage::helper('crypto')->request('getnewaddress', $address_request, $token);
 		
     }			
 }

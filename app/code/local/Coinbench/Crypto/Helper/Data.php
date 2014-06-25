@@ -2,8 +2,7 @@
 class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 {	
 
-	const _COINBENCH_TOKEN_URI = 'token';
-	const _COINBENCH_NEW_ADDRESS_URI = 'getnewaddress';
+	const _COINBENCH_API_URL = 'https://coinbench.io/api/';
 	
 	public function getExtensionVersion()
 	{
@@ -12,13 +11,7 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 
 	public function coinbench($resource, $postfields = null, $token = null){
 
-		$resource = _COINBENCH_TOKEN_URI;
-
-		if($resource=='getaddress'){
-			$uri = self::_COINBENCH_NEW_ADDRESS_URI;
-		}
-
-		return $this->request($uri, $postfields, $token);
+		return $this->request(self::_COINBENCH_NEW_ADDRESS_URI.$resource, $postfields, $token);
 		
 	}
 
@@ -44,8 +37,9 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 			);
 		}	
 		Mage::log("header: ".print_r($headers, true),null,'coinbench.log');	
-		$authenticationUrl = 'https://coinbench.io/api/'.$uri;
-		curl_setopt($ch, CURLOPT_URL, $authenticationUrl);
+		$curl_url = 'https://coinbench.io/api/'.$uri;
+		Mage::log("url:: ".$curl_url,null,'coinbench.log');	
+		curl_setopt($ch, CURLOPT_URL, $curl_url);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		if(!is_null($postfields)){
 			curl_setopt($ch, CURLOPT_POST, true);

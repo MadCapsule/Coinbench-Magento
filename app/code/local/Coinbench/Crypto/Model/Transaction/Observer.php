@@ -27,6 +27,9 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 		if(!empty($address['error']) && empty($transaction_data['message'])){
 			$transaction_data['message'] = $address['error'];
 			$transaction_data['status'] = 0;
+		}elseif(!empty($address['address'])){
+			$transaction_data['address'] = $address['address'];
+			$transaction_data['status'] = 1;
 		}
 
 		try{
