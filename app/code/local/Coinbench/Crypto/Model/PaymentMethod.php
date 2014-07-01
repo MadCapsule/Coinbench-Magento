@@ -15,7 +15,7 @@ class Coinbench_Crypto_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
 		    $data = new Varien_Object($data);
 		}
 		$info = $this->getInfoInstance();
-		$info->setCryptoCurrency($data->getCryptoCurrency())->setCryptoAmount($data->getCryptoAmount());
+		$info->setCryptoCurrency($data->getCryptoCurrency())->setCryptoAmount(Mage::helper('crypto')->getCoinQuotes($data->getCryptoCurrency()));
 		return $this;
 	    }
 	 

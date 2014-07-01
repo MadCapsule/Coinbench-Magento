@@ -3,18 +3,46 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 {	
 
 	const _COINBENCH_API_URL = 'https://coinbench.io/api/';
+	const _COINBENCH_RATES_URL = 'https://coinbench.io/rates/rates';
 
 
-	public function getCurrencies()
+	public function getCoinQuotes($coin = null)
 	{
 
-		$currencies = array();
+		$quotes = array();
+		$available_currencies = array();
 
-		if(Mage::getStoreConfig('payment/crypto/coins')){
-			$currencies = explode(',', Mage::getStoreConfig('payment/crypto/coins'));
+		if(Mage::getStoreConfig('payment/crypto/coins') && is_null($coin)){
+
+			$available_currencies = explode(',', Mage::getStoreConfig('payment/crypto/coins'));
+
+		}elseif(!is_null($coin)){
+
+			$available_currencies[] = $coin;
+
 		}
 
-		return $currencies;
+		// TODO: get base currency code for current store locale 
+		$base_currency = 'gbp';
+
+		if(!empty($available_currencies)){
+
+			if(is_null($rates = $this->getRates())){
+				return $quotes;
+			}
+
+			foreach($available_currencies as $currency){
+
+				$quote = $rates->{strtolower($currency)}->{$base_currency};
+
+				if($quote){
+					$quotes[] = array('code'=>$currency,'quote'=>$quote);
+				}
+
+			}
+		}
+
+		return $quotes;
 	
 	}
 	
@@ -29,6 +57,30 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 		
 	}
 
+	public function getRates(){
+
+
+		try{
+			Zend_Loader::loadClass('Zend_Http_Client'); 
+
+		}catch(Zend_Http_Client $e) {
+			throw new Exception($this->__('Unable to load Zend_Http_Client.'));
+		}
+
+		$feed = new Zend_Http_Client(self::_COINBENCH_RATES_URL);
+		$response = $feed->request('GET');
+
+		if($response->isError()){
+			return null;
+		}
+
+		return json_decode($response->getBody());
+
+	}
+
+	/*
+		TODO: Use Zend_Http_Client for this in the same way getRates works above and reduce code reuse
+	*/
 	public function request($uri, $postfields = null, $token = null)
 	{
 		Mage::log("JSON: ".json_encode($postfields),null,'coinbench.log');	
