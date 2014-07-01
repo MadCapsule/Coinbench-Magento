@@ -3,6 +3,20 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 {	
 
 	const _COINBENCH_API_URL = 'https://coinbench.io/api/';
+
+
+	public function getCurrencies()
+	{
+
+		$currencies = array();
+
+		if(Mage::getStoreConfig('payment/crypto/coins')){
+			$currencies = explode(',', Mage::getStoreConfig('payment/crypto/coins'));
+		}
+
+		return $currencies;
+	
+	}
 	
 	public function getExtensionVersion()
 	{

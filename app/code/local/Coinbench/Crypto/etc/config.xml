@@ -55,6 +55,16 @@
                 <class>Coinbench_Crypto_Helper</class>
             </crypto>  
         </helpers>
+        <fieldsets>
+             <sales_convert_quote_payment>
+                <crypto_currency>
+                    <to_order_payment>*</to_order_payment>
+                </crypto_currency>
+                <crypto_amount>
+                    <to_order_payment>*</to_order_payment>
+                </crypto_amount>
+             </sales_convert_quote_payment>
+        </fieldsets>
     </global>
     <frontend>
         <routers>

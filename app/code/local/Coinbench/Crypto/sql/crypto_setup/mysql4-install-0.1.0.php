@@ -19,6 +19,14 @@ CREATE TABLE {$this->getTable('coinbench_crypto_transactions')} (
   PRIMARY KEY  (`transaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  
+ALTER TABLE `{$this->getTable('sales/quote_payment')}` ADD `crypto_address` VARCHAR(255) NOT NULL;
+ALTER TABLE `{$this->getTable('sales/quote_payment')}` ADD `crypto_currency` VARCHAR(20) NOT NULL;
+ALTER TABLE `{$this->getTable('sales/quote_payment')}` ADD `crypto_amount` DECIMAL(12,8) NOT NULL;
+
+ALTER TABLE `{$this->getTable('sales/order_payment')}` ADD `crypto_address` VARCHAR(255) NOT NULL;
+ALTER TABLE `{$this->getTable('sales/order_payment')}` ADD `crypto_currency` VARCHAR(20) NOT NULL;
+ALTER TABLE `{$this->getTable('sales/order_payment')}` ADD `crypto_amount` DECIMAL(12,8) NOT NULL;
+
     ");
  
 $installer->endSetup();
