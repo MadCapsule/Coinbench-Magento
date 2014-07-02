@@ -3,7 +3,7 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 {	
 
 	const _COINBENCH_API_URL = 'https://coinbench.io/api/';
-	const _COINBENCH_RATES_URL = 'https://coinbench.io/rates/rates';
+	const _COINBENCH_RATES_URL = 'http://happy.com/rates.json';
 
 
 	public function getCoinQuotes($coin = null)
@@ -42,7 +42,11 @@ class Coinbench_Crypto_Helper_Data extends Mage_Core_Helper_Abstract
 			}
 		}
 
-		return $quotes;
+		if(is_null($coin)){
+			return $quotes;
+		}else{
+			return $quotes[0]['quote'];
+		}
 	
 	}
 	
