@@ -1,4 +1,11 @@
 <layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <block type="core/text" name="coinnbench">
+                <action method="setText"><text><![CDATA[<script src="//d-project.googlecode.com/svn/trunk/misc/qrcode/js/qrcode.js"></script>]]></text></action>
+            </block>
+        </reference>
+    </default>
 	<checkout_onepage_success>
     		<reference name="content">
         		<block type="crypto/success" name="crypto.success" template="checkout/onepage/coinbench/success.phtml"/>

@@ -15,7 +15,8 @@ class Coinbench_Crypto_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
 		    $data = new Varien_Object($data);
 		}
 		$info = $this->getInfoInstance();
-		$info->setCryptoCurrency($data->getCryptoCurrency())->setCryptoAmount(Mage::helper('crypto')->getCoinQuotes($data->getCryptoCurrency()));
+		$info->setCryptoCurrency($data->getCryptoCurrency());
+		$info->setCryptoAmount(Mage::helper('crypto')->getCoinQuotes($data->getCryptoCurrency()));
 		return $this;
 	    }
 	 
@@ -29,10 +30,10 @@ class Coinbench_Crypto_Model_PaymentMethod extends Mage_Payment_Model_Method_Abs
 		$currency = $info->getCryptoCurrency();
 		if(empty($currency)){
 		    $errorCode = 'invalid_data';
-		    $errorMsg = $this->_getHelper()->__('Select a crypto-currency');
+		    $errorMsg = $this->_getHelper()->__('No crypto-currency selected.');
 		}
 	 
-		if($errorMsg){
+		if(isset($errorMsg)){
 		    Mage::throwException($errorMsg);
 		}
 		return $this;

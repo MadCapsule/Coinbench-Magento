@@ -1,0 +1,12 @@
+<?php
+	$_code = $this->getMethodCode();
+?>
+<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
+	<li>
+		<?php echo $this->__('Unable to connect to API. Check authentication credentials.') ?> <a href="https://coinbench.io" target="_blank">Coinbench.io</a>
+	</li>
+</ul>
+
+<div>
+    <?php echo $this->getMethod()->getConfigData('message');?>
+</div>

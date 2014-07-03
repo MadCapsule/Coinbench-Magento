@@ -20,8 +20,11 @@
            	<class>Coinbench_Crypto_Model_Mysql4</class>  
             	<entities>
                 	<transaction>
-                    	<table>coinbench_crypto_transactions</table>
-                	</transaction>					
+                    		<table>coinbench_crypto_transactions</table>
+                	</transaction>	
+                	<address>
+                    		<table>coinbench_crypto_transactions</table>
+                	</address>				
             	</entities>                 
          </crypto_mysql4>
         </models>

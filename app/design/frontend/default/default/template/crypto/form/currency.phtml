@@ -1,10 +1,11 @@
 <?php
 	$_code = $this->getMethodCode();
 	$_crypto = Mage::helper('crypto');
+	$quotes = $_crypto->getCoinQuotes();
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
 <?php
-	if(!empty($_crypto->getCurrencies())){
+	if(!empty($quotes)){
 ?>
 
 	    <li>
@@ -13,12 +14,12 @@
 
 
 <?php
-	foreach($_crypto->getCurrencies() as $currency){
+	foreach($quotes as $currency){
 ?>
 	    <li>
-		<label for="<?php echo $_code ?>_currency_<?php echo $currency;?>">0.03512341 <?php echo $currency;?></label>
+		<label for="<?php echo $_code ?>_currency_<?php echo $currency['code'];?>"><?php echo $currency['quote'];?> <?php echo $currency['code'];?></label>
 		<span class="radio-box">
-		     <input type="radio" value="<?php echo $currency;?>" id="<?php echo $_code ?>_currency_<?php echo $currency;?>" name="payment[crypto_currency]">
+		     <input type="radio" value="<?php echo $currency['code'];?>" id="<?php echo $_code ?>_currency_<?php echo $currency['code'];?>" name="payment[crypto_currency]">
 		</span>
 	    </li>
 <?php   }}else{?>

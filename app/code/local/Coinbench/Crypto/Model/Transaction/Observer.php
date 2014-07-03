@@ -16,6 +16,8 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 
 		$transaction_data = array('order_id'=>$increment_id);
 
+//		$orderCreate->getQuote()->getPayment()->addData(array('method' => $paymentMethod));
+
 		$token = Mage::getModel('crypto/token')->obtain();
 		if(!empty($token['error'])){		
 			$transaction_data['message'] = $token['error'];
