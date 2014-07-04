@@ -105,6 +105,7 @@
                 <model>crypto/paymentMethod</model>
                 <!--<order_status>pending</order_status>-->
                 <title>Bitcoin, Feathercoin or Litecoin</title>
+                <verifications>6</verifications>
                 <allowspecific>0</allowspecific>
             </crypto>
          </payment>

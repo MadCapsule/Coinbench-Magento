@@ -55,34 +55,27 @@ class Coinbench_Crypto_Model_Transaction_Observer {
     		$transactions = $transits->getItems();
 		foreach($transactions as $transaction){
 
-			//TODO: if not verified and created date more than 1 hour ago, cancel.
-
 			$order = Mage::getModel('sales/order')->loadByIncrementId($transaction['order_id']);
-				Mage::log('order: '.$transaction['order_id'].' state: '.$order->getState().' seting: '.Mage::getStoreConfig('payment/crypto/order_status'), null, 'coinbench.log');
+			Mage::log('Order: '.$transaction['order_id'].' state: '.$order->getState().' seting: '.Mage::getStoreConfig('payment/crypto/order_status'), null, 'coinbench.log');
 			/*if($order->getState()!=Mage::getStoreConfig('payment/crypto/order_status')){
 				continue;
 			}*/
 
 			if($order->getState()!='new'){
+				//continue;
+			}
+
+			$verified = Mage::getModel('crypto/address')->verify($token['token'], $order->getPayment()->getCryptoCurrency(), $transaction['address'], $order->getPayment()->getCryptoAmount());			
+			Mage::log("Confirmations(".Mage::getStoreConfig('payment/crypto/verifications')."): ".$verified['confirmations']." Amount: ".$verified['amount'], null, 'coinbench.log');
+
+			if(!empty($verified['error'])){
 				continue;
 			}
 
-			$verified = Mage::getModel('crypto/address')->verify($token['token'], $order->getPayment()->getCryptoCurrency(), $order->getPayment()->getCryptoAmount());
-			Mage::log("Tried to verify transaction: ".$transactonp['order_id']." Got response: ".print_r($verified),null,'coinbench.log');				
-
-
-/*
-    [response] => stdClass Object
-        (
-            [code] => 200
-            [confirmations] => 
-            [amount] => 0.00000000
-        )
-*/
-
-			if(isset($verified)){
+			if($verified['confirmations']>=Mage::getStoreConfig('payment/crypto/verifications') && $verified['amount']==$order->getPayment()->getCryptoAmount()){
 				$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
 			}else{
+				//TODO: only cancel if the date of the transaction is older than 1 hour
 				$order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true);
 			}
 
