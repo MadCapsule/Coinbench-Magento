@@ -7,7 +7,7 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 			return;
 		}
 
-		Mage::log("Coinbench active");
+		Mage::log("Coinbench active", null, 'coinbench.log');
 
 		Mage::register('sales_order_save_commit_after_executed', true); 
 		$_order = $observer->getEvent()->getOrder();
@@ -23,7 +23,7 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 			Mage::log("Order ".$increment_id." no Coibench API token obtained. Error: ".$token['error']);
 		}
 
-		$address = Mage::getModel('crypto/address')->getFromPool($token['token'], 'btc', '31.20902000');
+		$address = Mage::getModel('crypto/address')->getFromPool($token['token'], $_order->getPayment()->getCryptoCurrency(), $_order->getPayment()->getCryptoAmount());
 		if(!empty($address['error']) && empty($transaction_data['message'])){
 			$transaction_data['message'] = $address['error'];
 			$transaction_data['status'] = 0;
@@ -41,12 +41,12 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 
 	public function verification(){
 
-		Mage::log("Coinbench verification process started");
+		Mage::log("Coinbench verification process started", null, 'coinbench.log');
 
 		$token = Mage::getModel('crypto/token')->obtain();
 
 		if(!empty($token['error'])){		
-			Mage::log("Coinbench can't verify transactions because there is no API token.");
+			return Mage::log("Coinbench can't verify transactions because there is no API token.", null, 'coinbench.log');
 		}
 
      		$transits = Mage::getModel("crypto/transaction")->getCollection();
@@ -55,22 +55,30 @@ class Coinbench_Crypto_Model_Transaction_Observer {
     		$transactions = $transits->getItems();
 		foreach($transactions as $transaction){
 
-			//if not verified and created date more than 1 hour ago, cancel.
-
-			// https://coinbench.io/api/getconfirmations
-			// "address":"125bvWgjBRmzoY1cEExFdiP5DsZQExb3sq","amount":"0.01010000"
+			//TODO: if not verified and created date more than 1 hour ago, cancel.
 
 			$order = Mage::getModel('sales/order')->loadByIncrementId($transaction['order_id']);
+				Mage::log('order: '.$transaction['order_id'].' state: '.$order->getState().' seting: '.Mage::getStoreConfig('payment/crypto/order_status'), null, 'coinbench.log');
+			/*if($order->getState()!=Mage::getStoreConfig('payment/crypto/order_status')){
+				continue;
+			}*/
 
-			//$verified = Mage::getModel('crypto/address')->verify($token['token'], 'btc', '31.20902000');
-
-			if($order->getState()!=Mage::getStoreConfig('payment/crypto/order_status')){
+			if($order->getState()!='new'){
 				continue;
 			}
 
-			//check if order save does an exception
+			$verified = Mage::getModel('crypto/address')->verify($token['token'], $order->getPayment()->getCryptoCurrency(), $order->getPayment()->getCryptoAmount());
+			Mage::log("Tried to verify transaction: ".$transactonp['order_id']." Got response: ".print_r($verified),null,'coinbench.log');				
 
-			//add order note
+
+/*
+    [response] => stdClass Object
+        (
+            [code] => 200
+            [confirmations] => 
+            [amount] => 0.00000000
+        )
+*/
 
 			if(isset($verified)){
 				$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
@@ -80,9 +88,13 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 
 			try{
 				$order->save();
+
 			}catch (Exception $e) {
-				//log exception
+				Mage::log($e, null, 'coinbench.log');
 			}
+
+			//update coinbench table
+			//add order note
 
 
 		}

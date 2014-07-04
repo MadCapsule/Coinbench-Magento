@@ -103,7 +103,7 @@
             <crypto>
                 <active>0</active>
                 <model>crypto/paymentMethod</model>
-                <order_status>pending</order_status>
+                <!--<order_status>pending</order_status>-->
                 <title>Bitcoin, Feathercoin or Litecoin</title>
                 <allowspecific>0</allowspecific>
             </crypto>
