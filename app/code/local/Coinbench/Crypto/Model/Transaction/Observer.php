@@ -16,8 +16,6 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 
 		$transaction_data = array('order_id'=>$increment_id);
 
-//		$orderCreate->getQuote()->getPayment()->addData(array('method' => $paymentMethod));
-
 		$token = Mage::getModel('crypto/token')->obtain();
 		if(!empty($token['error'])){		
 			$transaction_data['message'] = $token['error'];
@@ -39,6 +37,57 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 		}catch (Exception $e) {
 			Mage::log($e,null,'coinbench.log');
 	       	} 			
+	}
+
+	public function verification(){
+
+		Mage::log("Coinbench verification process started");
+
+		$token = Mage::getModel('crypto/token')->obtain();
+
+		if(!empty($token['error'])){		
+			Mage::log("Coinbench can't verify transactions because there is no API token.");
+		}
+
+     		$transits = Mage::getModel("crypto/transaction")->getCollection();
+    		$transits->addFieldToFilter('status', array('like' => '1'));
+
+    		$transactions = $transits->getItems();
+		foreach($transactions as $transaction){
+
+			//if not verified and created date more than 1 hour ago, cancel.
+
+			// https://coinbench.io/api/getconfirmations
+			// "address":"125bvWgjBRmzoY1cEExFdiP5DsZQExb3sq","amount":"0.01010000"
+
+			$order = Mage::getModel('sales/order')->loadByIncrementId($transaction['order_id']);
+
+			//$verified = Mage::getModel('crypto/address')->verify($token['token'], 'btc', '31.20902000');
+
+			if($order->getState()!=Mage::getStoreConfig('payment/crypto/order_status')){
+				continue;
+			}
+
+			//check if order save does an exception
+
+			//add order note
+
+			if(isset($verified)){
+				$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
+			}else{
+				$order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true);
+			}
+
+			try{
+				$order->save();
+			}catch (Exception $e) {
+				//log exception
+			}
+
+
+		}
+
+
 	}
 
 }

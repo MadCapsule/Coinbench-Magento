@@ -109,4 +109,12 @@
             </crypto>
          </payment>
     </default>
+    <crontab>
+        <jobs>
+            <coinbench_crypto_verification>
+                <schedule><cron_expr>* * * * *</cron_expr></schedule>
+                <run><model>crypto/transaction_observer::verification</model></run>
+            </coinbench_crypto_verification>
+        </jobs>
+    </crontab>
 </config>
