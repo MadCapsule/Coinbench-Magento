@@ -72,10 +72,13 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 				continue;
 			}
 
+			//TODO: update transaction statuses based on the below outcomes
 			if($verified['confirmations']>=Mage::getStoreConfig('payment/crypto/verifications') && $verified['amount']==$order->getPayment()->getCryptoAmount()){
+				
 				$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
-			}else{
-				//TODO: only cancel if the date of the transaction is older than 1 hour
+
+			}elseif(strtotime($transaction['created']) <= strtotime('-1 hour')){
+
 				$order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true);
 			}
 
