@@ -19,17 +19,16 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 		$token = Mage::getModel('crypto/token')->obtain();
 		if(!empty($token['error'])){		
 			$transaction_data['message'] = $token['error'];
-			$transaction_data['status'] = 0;
+			$transaction_data['status'] = 'failed';
 			Mage::log("Order ".$increment_id." no Coibench API token obtained. Error: ".$token['error']);
 		}
 
 		$address = Mage::getModel('crypto/address')->getFromPool($token['token'], $_order->getPayment()->getCryptoCurrency(), $_order->getPayment()->getCryptoAmount());
 		if(!empty($address['error']) && empty($transaction_data['message'])){
 			$transaction_data['message'] = $address['error'];
-			$transaction_data['status'] = 0;
+			$transaction_data['status'] = 'failed';
 		}elseif(!empty($address['address'])){
 			$transaction_data['address'] = $address['address'];
-			$transaction_data['status'] = 1;
 		}
 
 		try{
@@ -50,10 +49,13 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 		}
 
      		$transits = Mage::getModel("crypto/transaction")->getCollection();
-    		$transits->addFieldToFilter('status', array('like' => '1'));
+    		$transits->addFieldToFilter('status', array('like' => 'pending'));
 
     		$transactions = $transits->getItems();
 		foreach($transactions as $transaction){
+
+			$order_updated = false;
+			$transaction_status = 1;
 
 			$order = Mage::getModel('sales/order')->loadByIncrementId($transaction['order_id']);
 			Mage::log('Order: '.$transaction['order_id'].' state: '.$order->getState().' seting: '.Mage::getStoreConfig('payment/crypto/order_status'), null, 'coinbench.log');
@@ -76,20 +78,32 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 			if($verified['confirmations']>=Mage::getStoreConfig('payment/crypto/verifications') && $verified['amount']==$order->getPayment()->getCryptoAmount()){
 				
 				$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
+				$transaction_status = 'verified';
 
 			}elseif(strtotime($transaction['created']) <= strtotime('-1 hour')){
 
 				$order->setState(Mage_Sales_Model_Order::STATE_CANCELED, true);
+				$transaction_status = 'expired';
 			}
 
 			try{
 				$order->save();
+				$order_updated = true;
 
 			}catch (Exception $e) {
 				Mage::log($e, null, 'coinbench.log');
 			}
 
 			//update coinbench table
+			if($order_updated){
+	
+		    		$update_transaction = Mage::getModel('crypto/transaction');
+				$update_transaction->setTransactionId($transaction['transaction_id']);
+				$update_transaction->setStatus($transaction_status);
+				$update_transaction->save();
+
+			}
+
 			//add order note
 
 

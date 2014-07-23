@@ -10,7 +10,7 @@ CREATE TABLE {$this->getTable('coinbench_crypto_transactions')} (
   `transaction_id` int(11) NOT NULL auto_increment,
   `order_id` varchar(25) default NULL,
   `address` varchar(50) default NULL,
-  `status` int(11) default NULL,
+  `status` enum('pending','failed','verified','expired') DEFAULT 'pending',
   `message` varchar(150) DEFAULT NULL,
   `created` timestamp NULL default CURRENT_TIMESTAMP,
   `completed` timestamp NULL default NULL,
