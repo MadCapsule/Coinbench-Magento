@@ -35,8 +35,12 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 			$transaction = Mage::getModel('crypto/transaction')->setData($transaction_data)->save();
 		}catch (Exception $e) {
 			Mage::log($e,null,'coinbench.log');
-	       	} 			
-	}
+	       	} 
+
+		if(!empty($transaction_data['address'])){
+			$this->emailConfirmation($transaction_data['address'], $_order->getPayment()->getCryptoCurrency(), $_order->getPayment()->getCryptoAmount(), $_order->getCustomerEmail());
+		}			
+	}		
 
 	public function verification(){
 
@@ -108,6 +112,42 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 
 
 		}
+
+
+	}
+
+	private function emailConfirmation($address, $currency, $amount, $email){
+
+		$emailTemplate  = Mage::getModel('core/email_template')
+					->loadDefault('coinbench_transaction_template');	
+
+		/*$order = new Mage_Sales_Model_Order();
+		$incrementId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
+		$order->loadByIncrementId($incrementId);*/
+
+		$emailTemplateVariables = array();
+		$emailTemplateVariables['address'] = $address;
+		$emailTemplateVariables['currency'] = $currency;
+		$emailTemplateVariables['amount'] = $amount;
+/*
+		$customer_name = "".$order['customer_firstname']." ".$order['customer_lastname']."";
+
+		if(Mage::getStoreConfig('returndiscounts/settings/discountype')==1)
+		{
+			$em_subject = $amount."%";
+		}else{
+			$em_subject = Mage::app()->getLocale()->currency(Mage::app()->getStore()->getCurrentCurrencyCode())->getSymbol().$amount;
+		}				
+*/	
+		$emailTemplate->setTemplateSubject('Re: Your '.$currency.' Payment');
+
+		$storeEmail = Mage::getStoreConfig('trans_email/ident_sales/email');
+		$storeContact = Mage::getStoreConfig('trans_email/ident_sales/name'); 
+		$emailTemplate->setSenderEmail($storeEmail);
+		$emailTemplate->setSenderName($storeContact);
+
+		$emailTemplate->send($email, null, $emailTemplateVariables);
+		return;
 
 
 	}

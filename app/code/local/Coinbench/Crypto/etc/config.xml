@@ -68,6 +68,15 @@
                 </crypto_amount>
              </sales_convert_quote_payment>
         </fieldsets>
+	<template>
+		<email>
+                	<coinbench_transaction_template translate="label" module="crypto">
+                    	<label>Coinbench Transaction</label>
+                    	<file>coinbench_transaction.html</file>
+                    	<type>html</type>
+                	</coinbench_transaction_template>
+		</email>
+	</template>
     </global>
     <frontend>
         <routers>
