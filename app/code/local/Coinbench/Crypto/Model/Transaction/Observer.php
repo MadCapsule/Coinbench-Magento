@@ -35,8 +35,12 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 			$transaction = Mage::getModel('crypto/transaction')->setData($transaction_data)->save();
 		}catch (Exception $e) {
 			Mage::log($e,null,'coinbench.log');
-	       	} 			
-	}
+	       	} 
+
+		if(!empty($transaction_data['address'])){
+			$this->emailConfirmation($transaction_data['address'], $_order->getPayment()->getCryptoCurrency(), $_order->getPayment()->getCryptoAmount(), $_order->getCustomerEmail());
+		}			
+	}		
 
 	public function verification(){
 
@@ -108,6 +112,29 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 
 
 		}
+
+
+	}
+
+	private function emailConfirmation($address, $currency, $amount, $email){
+
+		$emailTemplate  = Mage::getModel('core/email_template')
+					->loadDefault('coinbench_transaction_template');	
+
+		$emailTemplateVariables = array();
+		$emailTemplateVariables['address'] = $address;
+		$emailTemplateVariables['currency'] = $currency;
+		$emailTemplateVariables['amount'] = $amount;
+	
+		$emailTemplate->setTemplateSubject('Re: Your '.$currency.' Payment');
+
+		$storeEmail = Mage::getStoreConfig('trans_email/ident_sales/email');
+		$storeContact = Mage::getStoreConfig('trans_email/ident_sales/name'); 
+		$emailTemplate->setSenderEmail($storeEmail);
+		$emailTemplate->setSenderName($storeContact);
+
+		$emailTemplate->send($email, null, $emailTemplateVariables);
+		return;
 
 
 	}
