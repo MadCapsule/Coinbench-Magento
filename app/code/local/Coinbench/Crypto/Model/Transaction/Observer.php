@@ -121,24 +121,11 @@ class Coinbench_Crypto_Model_Transaction_Observer {
 		$emailTemplate  = Mage::getModel('core/email_template')
 					->loadDefault('coinbench_transaction_template');	
 
-		/*$order = new Mage_Sales_Model_Order();
-		$incrementId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-		$order->loadByIncrementId($incrementId);*/
-
 		$emailTemplateVariables = array();
 		$emailTemplateVariables['address'] = $address;
 		$emailTemplateVariables['currency'] = $currency;
 		$emailTemplateVariables['amount'] = $amount;
-/*
-		$customer_name = "".$order['customer_firstname']." ".$order['customer_lastname']."";
-
-		if(Mage::getStoreConfig('returndiscounts/settings/discountype')==1)
-		{
-			$em_subject = $amount."%";
-		}else{
-			$em_subject = Mage::app()->getLocale()->currency(Mage::app()->getStore()->getCurrentCurrencyCode())->getSymbol().$amount;
-		}				
-*/	
+	
 		$emailTemplate->setTemplateSubject('Re: Your '.$currency.' Payment');
 
 		$storeEmail = Mage::getStoreConfig('trans_email/ident_sales/email');
